@@ -15,4 +15,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 #COPY ./app /var/www/app
 
-#CMD [ "python", "/var/www/app/main.py" ]
+#CMD [ "/var/www/startup.sh" ]
