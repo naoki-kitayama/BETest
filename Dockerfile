@@ -17,5 +17,6 @@ RUN mkdir tmp
 COPY ./app /var/www/app
 COPY ./static /var/www/static
 COPY ./startup.sh /var/www/startup.sh
+RUN chmod 755 /var/www/startup.sh
 
 CMD [ "/var/www/startup.sh" ]
