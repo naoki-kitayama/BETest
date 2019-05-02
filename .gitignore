@@ -1,2 +1,7 @@
 # dbファイルを無視
 transaction.db
+
+# その他の一次ファイルを無視
+__pycache__
+.idea
+
