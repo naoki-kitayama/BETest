@@ -35,7 +35,7 @@ api = responder.API()
 
 # データベースの初期化
 transaction_db.init()
-
+#transaction_db.create()
 
 # =========================================
 # それぞれの処理（サービス）にURLを割り当てる
@@ -48,8 +48,8 @@ def api_read_table(req, resp):
 
 # テーブルのデータを1行追加・更新
 @api.route("/api/write-table")
-def api_write_table(req, resp):
-	write_table.execute(req, resp)
+async def api_write_table(req, resp):
+	await write_table.execute(req, resp)
 
 # UIのHTMLファイルを返す
 api.add_route("/", static=True)
@@ -58,4 +58,4 @@ api.add_route("/", static=True)
 # responderのサーバ起動処理
 if __name__ == '__main__':
 	# api.run(address="0.0.0.0",port=80)
-	api.run()
+	api.run(port=8000)

@@ -3,7 +3,7 @@
 
 """
 transaction_db.py
-transaction.dbの読み込み、書き込み中継器
+データベースの処理
 """
 
 # データベースへのアクセスに使用
@@ -29,7 +29,19 @@ def init():
     dbx.files_download_to_file(DBNAME, DROPBOX_PATH)
 
 
-def in_it():
+# DBファイルを外部にバックアップ
+def save_file():
+    dbx = dropbox.Dropbox( DROPBOX_TOKEN )
+    dbx.users_get_current_account()
+
+    # dropboxにアップロード
+    with open(DBNAME, "rb") as f:
+        dbx.files_upload(f.read(), DROPBOX_PATH, mode=dropbox.files.WriteMode('overwrite'))
+
+
+# データベース作成用のコード　本番では不使用
+def create():
+    # 物品台帳（仮）
     create_table_ledger = '''
         CREATE TABLE ledger (
             id INTEGER PRIMARY KEY, 
@@ -39,6 +51,7 @@ def in_it():
             last_update DATETIME
         )
     '''
+    # データ変更履歴
     create_table_write_history = '''
         CREATE TABLE write_history (
             id INTEGER PRIMARY KEY, 
@@ -47,6 +60,13 @@ def in_it():
             quantity INTEGER, 
             note VARCHAR(64), 
             success BOOLEAN, 
+            date DATETIME
+        )
+    '''
+    # 利用者ごとの最終アクセス時間
+    create_table_last_access = '''
+        CREATE TABLE last_access (
+            user_name VARCHAR(32) PRIMARY KEY, 
             date DATETIME
         )
     '''
@@ -64,61 +84,10 @@ def in_it():
         # テーブル作成の実行
         c.execute(create_table_ledger)
         c.execute(create_table_write_history)
+        c.execute(create_table_last_access)
 
         c.executemany(insert_ledger, ledger)
         conn.commit()
 
     # バックアップファイルを上書きする
     save_file()
-
-
-# 台帳を全行取得
-def read_all():
-    result = []
-
-    select_ledger_list = 'SELECT id, name, quantity, note, last_update FROM ledger ORDER BY id ASC'
-
-    with closing(sqlite3.connect(DBNAME)) as conn:
-        c = conn.cursor()
-        c.execute(select_ledger_list)
-        result = c.fetchall()
-
-    return result
-
-
-# 台帳の特定の1行取得
-def read(id):
-    result = None
-
-    select_ledger = 'SELECT id, name, quantity, note, last_update FROM ledger WHERE id=?'
-
-    with closing(sqlite3.connect(DBNAME)) as conn:
-        c = conn.cursor()
-        c.execute(select_ledger, (id, ))
-        result = c.fetchone()
-
-    return result
-
-
-# 台帳の1行更新
-def write(id, name, quantity, note):
-    # REPLACE(SQLite):テーブルの主キーで判別。データがあればUPDATE、無ければINSERT
-    replace_ledger = "REPLACE INTO ledger (id, name, quantity, note, last_update) VALUES (?,?,?,?,datetime('now', '+9 hours'))"
-
-    with closing(sqlite3.connect(DBNAME)) as conn:
-        c = conn.cursor()
-
-        c.executemany(replace_ledger, (id, name, quantity, note))
-        conn.commit()
-
-# 履歴を記録
-def write_history(id, name, note, success, date):
-    pass
-
-# DBファイルを外部にバックアップ
-def save_file():
-    dbx = dropbox.Dropbox( DROPBOX_TOKEN )
-    dbx.users_get_current_account()
-
-    with open(DBNAME, "rb") as f:
-        dbx.files_upload(f.read(), DROPBOX_PATH, mode=dropbox.files.WriteMode('overwrite'))
