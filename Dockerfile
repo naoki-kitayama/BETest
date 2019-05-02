@@ -13,9 +13,8 @@ COPY ./.htpasswd /etc/nginx/
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN mkdir tmp
+RUN rm -f /var/www/app/tmp/*
 COPY ./app /var/www/app
-COPY ./static /var/www/static
 COPY ./startup.sh /var/www/startup.sh
 COPY ./startup_local.sh /var/www/startup_local.sh
 COPY ./supervisord.conf /etc/supervisord.conf
