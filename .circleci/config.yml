@@ -6,8 +6,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: pekiyama/betest
+      - image: circleci/python:3.7.2
 
     working_directory: /var/www
     steps:
       - checkout
+      - run:
+          command: |
+            pip install --no-cache-dir -r requirements.txt
+            
