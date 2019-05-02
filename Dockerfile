@@ -15,11 +15,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./supervisord.conf /etc/supervisord.conf
 
-#RUN rm -rf /var/www/app/tmp
-#RUN mkdir -p /var/www/app/tmp
-#COPY ./app /var/www/app
-#COPY ./startup.sh /var/www/startup.sh
-#COPY ./startup_local.sh /var/www/startup_local.sh
-#RUN chmod 755 /var/www/startup.sh
+RUN rm -rf /var/www/app/tmp
+RUN mkdir -p /var/www/app/tmp
+COPY ./app /var/www/app
+COPY ./startup.sh /var/www/startup.sh
+COPY ./startup_local.sh /var/www/startup_local.sh
+RUN chmod 755 /var/www/startup.sh
 
-#CMD [ "/var/www/startup.sh" ]
+CMD [ "/var/www/startup.sh" ]
