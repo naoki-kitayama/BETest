@@ -13,6 +13,9 @@ COPY ./.htpasswd /etc/nginx/
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-#COPY ./app /var/www/app
+RUN mkdir tmp
+COPY ./app /var/www/app
+COPY ./static /var/www/static
+COPY ./startup.sh /var/www/startup.sh
 
-#CMD [ "/var/www/startup.sh" ]
+CMD [ "/var/www/startup.sh" ]
